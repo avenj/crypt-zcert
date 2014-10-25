@@ -274,7 +274,7 @@ sub commit {
 
 =head1 NAME
 
-Crypt::ZCert - Manage ZeroMQ ZCert CURVE certificates
+Crypt::ZCert - Manage ZeroMQ4+ ZCert CURVE certificates
 
 =head1 SYNOPSIS
 
@@ -303,11 +303,82 @@ Crypt::ZCert - Manage ZeroMQ ZCert CURVE certificates
 
 =head1 DESCRIPTION
 
-A module for creating & loading ZeroMQ "ZCert" files.
+A module for creating & loading ZeroMQ "ZCert" certificates.
+
+These are simple C<ZPL> (see L<Text::ZPL>) files containing two subsections,
+C<curve> and C<metadata>. The C<curve> section specifies a C<public-key> and
+C<secret-key>.
+
+On disk, the certificate is stored as two files; a L</public_file> (containing
+only the public key) and a L</secret_file> (containing both keys).
+
+Also see: L<http://czmq.zeromq.org/manual:zcert>
 
 =head2 ATTRIBUTES
 
+=head3 public_file
+
+The path to the public ZCert.
+
+Coerced to a L<Path::Tiny>.
+
+=head3 secret_file
+
+The path to the secret ZCert; defaults to appending '_secret' to
+L</public_file>.
+
+Coerced to a L<Path::Tiny>.
+
+=head3 adjust_permissions
+
+If boolean true, C<chmod> will be used to attempt to set the L</secret_file>'s
+permissions to C<0600> after writing.
+
+=head3 public_key
+
+The public key, as a 32-bit binary string.
+
+If none is specified at construction-time and no L</secret_file> exists, a new
+key pair is generated via L<zmq_curve_keypair(3)> and L</secret_key> is set
+appropriately.
+
+=head3 secret_key
+
+The secret key, as a 32-bit binary string.
+
+If none is specified at construction-time and no L</secret_file> exists, a new
+key pair is generated via L<zmq_curve_keypair(3)> and L</public_key> is set
+appropriately.
+
+=head3 public_key_z85
+
+The L</public_key>, as a C<Z85>-encoded ASCII string (see L<Convert::Z85>).
+
+=head3 secret_key_z85
+
+The L</secret_key>, as a C<Z85>-encoded ASCII string (see L<Convert::Z85>).
+
+=head3 metadata
+
+The certificate metadata, as a L<List::Objects::WithUtils::Hash>.
+
 =head2 METHODS
+
+=head3 generate_keypair
+
+Generate and return a new key pair via L<zmq_curve_keypair(3)>; the current
+ZCert object remains unchanged.
+
+The returned key pair is a struct-like object with two accessors, B<public>
+and B<secret>:
+
+  my $keypair = $zcert->generate_keypair;
+  my $pub_z85 = $keypair->public;
+  my $sec_z85 = $keypair->secret;
+
+=head3 commit
+
+Write L</public_file> and L</secret_file> to disk.
 
 =head1 AUTHOR
 
