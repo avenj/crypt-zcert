@@ -54,7 +54,6 @@ has public_key_z85 => (
   lazy        => 1,
   is          => 'ro',
   isa         => Str,
-  predicate   => 1,
   writer      => '_set_public_key_z85',
   builder     => sub {
     my ($self) = @_;
@@ -68,7 +67,6 @@ has secret_key_z85 => (
   lazy        => 1,
   is          => 'ro',
   isa         => Str,
-  predicate   => 1,
   writer      => '_set_secret_key_z85',
   builder     => sub {
     my ($self) = @_;
@@ -269,6 +267,8 @@ sub commit {
 
 =pod
 
+=for Pod::Coverage has_\w+_file
+
 =head1 NAME
 
 Crypt::ZCert - Manage ZeroMQ4+ ZCert CURVE certificates
@@ -319,12 +319,16 @@ The path to the public ZCert.
 
 Coerced to a L<Path::Tiny>.
 
+Predicate: C<has_public_file>
+
 =head3 secret_file
 
 The path to the secret ZCert; defaults to appending '_secret' to
 L</public_file>.
 
 Coerced to a L<Path::Tiny>.
+
+Predicate: C<has_secret_file>
 
 =head3 adjust_permissions
 
@@ -357,7 +361,24 @@ The L</secret_key>, as a C<Z85>-encoded ASCII string (see L<Convert::Z85>).
 
 =head3 metadata
 
+  # Get value:
+  my $foo = $zcert->metadata->get('foo');
+
+  # Iterate over metadata:
+  my $iter = $zcert->metadata->iter;
+  while ( my ($key, $val) = $iter->() ) {
+    print "$key -> $val\n";
+  }
+
+  # Update metadata & write to disk:
+  $zcert->metadata->set(foo => 'bar');
+  $zcert->commit;
+
 The certificate metadata, as a L<List::Objects::WithUtils::Hash>.
+
+If the object is constructed from an existing L</public_file> /
+L</secret_file>, metadata key/value pairs in the loaded file will override
+key/value pairs set in the object's C<metadata> hash.
 
 =head3 zmq_soname
 
