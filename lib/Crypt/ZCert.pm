@@ -238,13 +238,8 @@ sub generate_keypair {
   )->inflate
 }
 
-sub commit {
+sub generate_zcert {
   my ($self) = @_;
-
-  confess "commit() called but no public_file / secret_file set"
-    unless $self->has_public_file
-      and  $self->public_file
-      and  $self->secret_file;
 
   my $data = +{
      curve    => +{
@@ -253,12 +248,31 @@ sub commit {
     metadata => $self->metadata,
   };
   
-  $self->public_file->spew( encode_zpl($data) );
+  my $public = encode_zpl $data;
   $data->{curve}->{'secret-key'} = $self->secret_key_z85;
-  $self->secret_file->spew( encode_zpl($data) );
+  my $secret = encode_zpl $data;
+
+  hash(
+    public => $public,
+    secret => $secret,
+  )->inflate
+}
+
+sub commit {
+  my ($self) = @_;
+
+  confess "commit() called but no public_file / secret_file set"
+    unless $self->has_public_file
+      and  $self->public_file
+      and  $self->secret_file;
+
+  my $zcert = $self->generate_zcert;
+  
+  $self->public_file->spew( $zcert->public );
+  $self->secret_file->spew( $zcert->secret );
   $self->secret_file->chmod(0600) if $self->adjust_permissions;
 
-  $data
+  1
 }
 
 
@@ -408,6 +422,16 @@ and B<secret>:
   my $keypair = $zcert->generate_keypair;
   my $pub_z85 = $keypair->public;
   my $sec_z85 = $keypair->secret;
+
+=head3 generate_zcert
+
+Generate and return the current ZCert; the certificate is represented as a
+struct-like object with two accessors, B<public> and B<secret>, containing
+ZPL-encoded ASCII text:
+
+  my $certdata = $zcert->generate_zcert;
+  my $public_zpl = $certdata->public;
+  my $secret_zpl = $certdata->secret;
 
 =head3 commit
 
