@@ -41,6 +41,7 @@ has secret_file => (
   is          => 'ro',
   isa         => Maybe[Path],
   coerce      => 1,
+  predicate   => 1,
   builder     => sub {
     my ($self) = @_;
     $self->has_public_file ?
@@ -200,9 +201,8 @@ sub BUILD {
 sub _read_cert {
   my ($self) = @_;
 
-  return unless $self->has_public_file
-    and defined $self->public_file
-    and $self->secret_file->exists;
+  return unless $self->has_secret_file or $self->has_public_file;
+  return unless $self->secret_file->exists;
     
   unless ($self->public_file->exists) {
     warn "Found 'secret_file' but not 'public_file': ".$self->public_file,
@@ -245,6 +245,11 @@ sub generate_keypair {
 
 sub commit {
   my ($self) = @_;
+
+  confess "commit() called but no public_file / secret_file set"
+    unless $self->has_public_file
+      and  $self->public_file
+      and  $self->secret_file;
 
   my $data = +{
      curve    => +{
