@@ -8,6 +8,24 @@ use Path::Tiny;
 use Convert::Z85;
 use Text::ZPL;
 
+{ # generate_keypair
+  my $keypair = Crypt::ZCert->new->generate_keypair;
+  ok $keypair->public && $keypair->secret, 'keypair ok';
+}
+
+{ # generate_zcert
+  my $zcert = Crypt::ZCert->new->generate_zcert;
+  my $pub_data = decode_zpl $zcert->public;
+  my $sec_data = decode_zpl $zcert->secret;
+  ok $pub_data->{curve}->{'public-key'}, 'generate_zcert public-key ok';
+  ok !$pub_data->{curve}->{'secret-key'},
+    'generate_zcert no secret-key in public ok';
+  ok $sec_data->{curve}->{'public-key'} eq $pub_data->{curve}->{'public-key'},
+    'generate_zcert public-key in secret ok';
+  ok $sec_data->{curve}->{'secret-key'}, 'generate_zcert secret-key ok';
+  ok ref $sec_data->{metadata} eq 'HASH'
+    && ref $pub_data->{metadata} eq 'HASH', 'generate_zcert metadata ok';
+}
 
 { # public_file, extant
   my $zpl  = path('t/inc/zcert_secret')->slurp;
@@ -99,11 +117,6 @@ FIXME
       quux => 'fwee',
     },
     'roundtripped metadata changes ok';
-}
-
-{ # generate_keypair
-  my $keypair = Crypt::ZCert->new->generate_keypair;
-  ok $keypair->public && $keypair->secret, 'keypair ok';
 }
 
 
