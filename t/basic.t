@@ -13,18 +13,18 @@ use Text::ZPL;
   ok $keypair->public && $keypair->secret, 'keypair ok';
 }
 
-{ # generate_zcert
-  my $zcert = Crypt::ZCert->new->generate_zcert;
+{ # export_zcert
+  my $zcert = Crypt::ZCert->new->export_zcert;
   my $pub_data = decode_zpl $zcert->public;
   my $sec_data = decode_zpl $zcert->secret;
-  ok $pub_data->{curve}->{'public-key'}, 'generate_zcert public-key ok';
+  ok $pub_data->{curve}->{'public-key'}, 'export_zcert public-key ok';
   ok !$pub_data->{curve}->{'secret-key'},
-    'generate_zcert no secret-key in public ok';
+    'export_zcert no secret-key in public ok';
   ok $sec_data->{curve}->{'public-key'} eq $pub_data->{curve}->{'public-key'},
-    'generate_zcert public-key in secret ok';
-  ok $sec_data->{curve}->{'secret-key'}, 'generate_zcert secret-key ok';
+    'export_zcert public-key in secret ok';
+  ok $sec_data->{curve}->{'secret-key'}, 'export_zcert secret-key ok';
   ok ref $sec_data->{metadata} eq 'HASH'
-    && ref $pub_data->{metadata} eq 'HASH', 'generate_zcert metadata ok';
+    && ref $pub_data->{metadata} eq 'HASH', 'export_zcert metadata ok';
 }
 
 { # public_file, extant

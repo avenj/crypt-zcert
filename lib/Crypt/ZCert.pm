@@ -231,7 +231,7 @@ sub generate_keypair {
   )->inflate
 }
 
-sub generate_zcert {
+sub export_zcert {
   my ($self) = @_;
 
   my $data = +{
@@ -259,7 +259,7 @@ sub commit {
       and  $self->public_file
       and  $self->secret_file;
 
-  my $zcert = $self->generate_zcert;
+  my $zcert = $self->export_zcert;
   
   $self->public_file->spew( $zcert->public );
   $self->secret_file->spew( $zcert->secret );
@@ -416,13 +416,13 @@ and B<secret>:
   my $pub_z85 = $keypair->public;
   my $sec_z85 = $keypair->secret;
 
-=head3 generate_zcert
+=head3 export_zcert
 
 Generate and return the current ZCert; the certificate is represented as a
 struct-like object with two accessors, B<public> and B<secret>, containing
 ZPL-encoded ASCII text:
 
-  my $certdata = $zcert->generate_zcert;
+  my $certdata = $zcert->export_zcert;
   my $public_zpl = $certdata->public;
   my $secret_zpl = $certdata->secret;
 
