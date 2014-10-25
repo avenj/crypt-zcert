@@ -306,12 +306,20 @@ Crypt::ZCert - Manage ZeroMQ4+ ZCert CURVE certificates
   my $pub_z85 = $zcert->public_key_z85;
   my $sec_z85 = $zcert->secret_key_z85;
 
-  # Commit any freshly generated keys to disk
-  # (as '/foo/mycert', '/foo/mycert_secret')
+  # Alter metadata:
+  $zcert->metadata->set(foo => 'bar');
+
+  # Commit certificate to disk
+  # (as '/foo/mycert', '/foo/mycert_secret' pair)
   # Without 'adjust_permissions => 0', _secret becomes chmod 0600:
   $zcert->commit;
 
-  # Retrieve a key pair (no on-disk certificate):
+  # Retrieve a public/secret ZCert file pair without writing:
+  my $certdata = $zcert->export_zcert;
+  my $pubdata  = $certdata->public;
+  my $secdata  = $certdata->secret;
+
+  # Retrieve a newly-generated key pair (no certificate):
   my $keypair = Crypt::ZCert->new->generate_keypair;
   my $pub_z85 = $keypair->public;
   my $sec_z85 = $keypair->secret;
@@ -357,6 +365,14 @@ Predicate: C<has_secret_file>
 
 If boolean true, C<chmod> will be used to attempt to set the L</secret_file>'s
 permissions to C<0600> after writing.
+
+=head3 ignore_existing
+
+If boolean true, any existing L</public_file> / L</secret_file> will not be
+read; calling a L</commit> will cause a forcible regeneration/rewrite of the
+existing certificate files.
+
+(Obviously, this should be used with caution.)
 
 =head3 public_key
 
@@ -410,17 +426,9 @@ is chosen.
 
 =head2 METHODS
 
-=head3 generate_keypair
+=head3 commit
 
-Generate and return a new key pair via L<zmq_curve_keypair(3)>; the current
-ZCert object remains unchanged.
-
-The returned key pair is a struct-like object with two accessors, B<public>
-and B<secret>:
-
-  my $keypair = $zcert->generate_keypair;
-  my $pub_z85 = $keypair->public;
-  my $sec_z85 = $keypair->secret;
+Write L</public_file> and L</secret_file> to disk.
 
 =head3 export_zcert
 
@@ -432,9 +440,17 @@ ZPL-encoded ASCII text:
   my $public_zpl = $certdata->public;
   my $secret_zpl = $certdata->secret;
 
-=head3 commit
+=head3 generate_keypair
 
-Write L</public_file> and L</secret_file> to disk.
+Generate and return a new key pair via L<zmq_curve_keypair(3)>; the current
+ZCert object remains unchanged.
+
+The returned key pair is a struct-like object with two accessors, B<public>
+and B<secret>:
+
+  my $keypair = $zcert->generate_keypair;
+  my $pub_z85 = $keypair->public;
+  my $sec_z85 = $keypair->secret;
 
 =head1 AUTHOR
 
