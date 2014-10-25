@@ -267,7 +267,7 @@ sub commit {
 
 =pod
 
-=for Pod::Coverage has_\w+_file
+=for Pod::Coverage BUILD has_\w+_file
 
 =head1 NAME
 
@@ -279,9 +279,9 @@ Crypt::ZCert - Manage ZeroMQ4+ ZCert CURVE certificates
 
   my $zcert = Crypt::ZCert->new(
     public_file => "/foo/mycert",
-
-    # Optionally specify a secret file not named "${public_file}_secret"
-    # secret_file => "/foo/sekrit",
+    # Optionally specify a secret file;
+    # defaults to "${public_file}_secret":
+    secret_file => "/foo/sekrit",
   );
 
   # Loaded from existing 'secret_file' if present,
@@ -290,21 +290,31 @@ Crypt::ZCert - Manage ZeroMQ4+ ZCert CURVE certificates
   my $seckey = $zcert->secret_key;
 
   # ... or as the original Z85:
-  my $pubkey = $zcert->public_key_z85;
-  my $seckey = $zcert->secret_key_z85;
+  my $pub_z85 = $zcert->public_key_z85;
+  my $sec_z85 = $zcert->secret_key_z85;
 
   # Commit any freshly generated keys to disk
   # (as '/foo/mycert', '/foo/mycert_secret')
   # Without 'adjust_permissions => 0', _secret becomes chmod 0600:
   $zcert->commit;
 
+  # Retrieve a key pair (no on-disk certificate):
+  my $keypair = Crypt::ZCert->new->generate_keypair;
+  my $pub_z85 = $keypair->public;
+  my $sec_z85 = $keypair->secret;
+
 =head1 DESCRIPTION
 
-A module for creating & loading ZeroMQ "ZCert" certificates.
+A module for managing ZeroMQ "ZCert" certificates and calling
+L<zmq_curve_keypair(3)> from L<libzmq|http://www.zeromq.org> to generate CURVE
+keys.
 
-These are simple C<ZPL> (see L<Text::ZPL>) files containing two subsections,
-C<curve> and C<metadata>. The C<curve> section specifies a C<public-key> and
-C<secret-key>.
+=head2 ZCerts
+
+ZCert files are C<ZPL> format (see L<Text::ZPL>) with two subsections,
+C<curve> and C<metadata>. The C<curve> section specifies C<public-key> and
+C<secret-key> names whose values are C<Z85>-encoded (see L<Convert::Z85> CURVE
+keys.
 
 On disk, the certificate is stored as two files; a L</public_file> (containing
 only the public key) and a L</secret_file> (containing both keys).
