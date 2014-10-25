@@ -271,7 +271,7 @@ sub commit {
   $self->secret_file->spew( $zcert->secret );
   $self->secret_file->chmod(0600) if $self->adjust_permissions;
 
-  1
+  $self
 }
 
 
