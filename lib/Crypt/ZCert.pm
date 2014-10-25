@@ -26,6 +26,12 @@ has adjust_permissions => (
   builder     => sub { 1 },
 );
 
+has ignore_existing => (
+  is          => 'ro',
+  isa         => Bool,
+  builder     => sub { 0 },
+);
+
 has public_file => (
   lazy        => 1,
   is          => 'ro',
@@ -184,7 +190,7 @@ has _zmq_curve_keypair => (
 
 sub BUILD {
   my ($self) = @_;
-  $self->_read_cert;
+  $self->_read_cert unless $self->ignore_existing;
 }
 
 sub _read_cert {
