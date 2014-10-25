@@ -166,15 +166,6 @@ has _zmq_strerr => (
   },
 );
 
-sub _handle_zmq_error {
-  my ($self, $rc) = @_;
-  if ($rc == -1) {
-    my $errno  = $self->_zmq_errno->();
-    my $errstr = $self->_zmq_strerr->($errno);
-    confess "libzmq zmq_curve_keypair failed: $errstr ($errno)"
-  }
-}
-
 has _zmq_curve_keypair => (
   lazy        => 1,
   is          => 'ro',
@@ -228,9 +219,11 @@ sub generate_keypair {
     FFI::Raw::memptr(41), FFI::Raw::memptr(41)
   );
 
-  $self->_handle_zmq_error(
-    $self->_zmq_curve_keypair->($pub, $sec)
-  );
+  if ( $self->_zmq_curve_keypair->($pub, $sec) == -1 ) {
+    my $errno  = $self->_zmq_errno->();
+    my $errstr = $self->_zmq_strerr->($errno);
+    confess "libzmq zmq_curve_keypair failed: $errstr ($errno)"
+  }
 
   hash(
     public => $pub->tostr,
