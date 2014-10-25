@@ -197,9 +197,19 @@ sub _read_cert {
   my ($self) = @_;
 
   return unless $self->has_secret_file or $self->has_public_file;
-  return unless $self->secret_file->exists;
-    
-  unless ($self->public_file->exists) {
+
+  unless ($self->secret_file->exists) {
+    if ($self->public_file && $self->public_file->exists) {
+      # public_file exists, secret_file does not, do the safe thing and
+      # refuse to overwrite existing public_file:
+      confess "Found 'public_file' but not 'secret_file'; ",
+              "Check your key file paths, remove the 'public_file', ",
+              "or specify 'ignore_existing => 1' to overwrite"
+   }
+    return
+  }
+  
+  if ($self->public_file && !$self->public_file->exists) {
     warn "Found 'secret_file' but not 'public_file': ".$self->public_file,
          " -- you may want to call a commit()"
   }
