@@ -27,29 +27,25 @@ has adjust_permissions => (
   builder     => sub { 1 },
 );
 
-has in_memory => (
-  is          => 'ro',
-  isa         => Bool,
-  builder     => sub { 0 },
-);
-
 has public_file => (
   lazy        => 1,
   is          => 'ro',
-  isa         => Path,
+  isa         => Maybe[Path],
   coerce      => 1,
-  builder     => sub { '' },
+  predicate   => 1,
+  builder     => sub { undef },
 );
 
 has secret_file => (
   lazy        => 1,
   is          => 'ro',
-  isa         => Path,
+  isa         => Maybe[Path],
   coerce      => 1,
   builder     => sub {
     my ($self) = @_;
-    return '' if $self->in_memory;
-    $self->public_file . '_secret'
+    $self->has_public_file ?
+      $self->public_file . '_secret'
+      : undef
   },
 );
 
@@ -60,8 +56,12 @@ has public_key_z85 => (
   isa         => Str,
   predicate   => 1,
   writer      => '_set_public_key_z85',
-  # FIXME builder to trigger a keygen if missing,
-  #  set secret_key_z85
+  builder     => sub {
+    my ($self) = @_;
+    my $keypair = $self->generate_keypair;
+    $self->_set_secret_key_z85( $keypair->secret );
+    $keypair->public
+  },
 );
 
 has secret_key_z85 => (
@@ -70,22 +70,26 @@ has secret_key_z85 => (
   isa         => Str,
   predicate   => 1,
   writer      => '_set_secret_key_z85',
-  # FIXME builder to trigger a keygen if missing,
-  #   set public_key_z85
+  builder     => sub {
+    my ($self) = @_;
+    my $keypair = $self->generate_keypair;
+    $self->_set_public_key_z85( $keypair->public );
+    $keypair->secret
+  },
 );
 
 has public_key => (
   lazy        => 1,
   is          => 'ro',
   isa         => Defined,
-  builder     => sub { z85_decode( shift->public_key_z85 ) },
+  builder     => sub { decode_z85( shift->public_key_z85 ) },
 );
 
 has secret_key => (
   lazy        => 1,
   is          => 'ro',
   isa         => Defined,
-  builder     => sub { z85_decode( shift->secret_key_z85 ) },
+  builder     => sub { decode_z85( shift->secret_key_z85 ) },
 );
 
 has metadata => (
@@ -190,23 +194,17 @@ has _zmq_curve_keypair => (
 
 sub BUILD {
   my ($self) = @_;
-
-  unless ($self->in_memory) {
-    confess "Expected either a 'public_file' path or 'in_memory => 1'"
-      unless $self->public_file;
-
-    $self->_read_cert;
-  }
+  $self->_read_cert;
 }
 
 sub _read_cert {
   my ($self) = @_;
 
-  if ($self->public_file->exists && !$self->secret_file->exists) {
-    confess "Found 'public_file' but not 'secret_file': ".$self->secret_file
-  }
-
-  if ($self->secret_file->exists && !$self->public_file->exists) {
+  return unless $self->has_public_file
+    and defined $self->public_file
+    and $self->secret_file->exists;
+    
+  unless ($self->public_file->exists) {
     warn "Found 'secret_file' but not 'public_file': ".$self->public_file,
          " -- you may want to call a commit()"
   }
@@ -236,13 +234,12 @@ sub generate_keypair {
   );
 
   $self->_handle_zmq_error(
-    $self->_zmq_curve_keypair->($pub, $sec);
+    $self->_zmq_curve_keypair->($pub, $sec)
   );
 
-  # FIXME copy zunpack 'string' behavior
   hash(
-    public => $pub_z85,
-    secret => $sec_z85,
+    public => $pub->tostr,
+    secret => $sec->tostr,
   )->inflate
 }
 
@@ -259,10 +256,7 @@ sub commit {
   $self->public_file->spew( encode_zpl($data) );
   $data->{curve}->{'secret-key'} = $self->secret_key_z85;
   $self->secret_file->spew( encode_zpl($data) );
-
-  if ($self->adjust_permissions) {
-    chmod 0600, $sec_key_path
-  }
+  $self->secret_file->chmod(0600) if $self->adjust_permissions;
 
   $data
 }
