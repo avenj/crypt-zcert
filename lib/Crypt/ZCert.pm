@@ -17,9 +17,8 @@ use List::Objects::Types  -types;
 use Types::Path::Tiny     -types;
 use Types::Standard       -types;
 
+
 use Moo; use MooX::late;
-
-
 
 has adjust_permissions => (
   is          => 'ro',
@@ -101,10 +100,11 @@ has metadata => (
   builder     => sub { +{} },
 );
 
-has _zmq_soname => (
+has zmq_soname => (
   is          => 'ro',
   isa         => Str,
   builder     => sub {
+    # Early 4.x installs as libzmq.so.3 ->
     state $search = [ qw/
       libzmq.so.4
       libzmq.so.4.0.0
@@ -152,7 +152,7 @@ has _zmq_errno => (
   isa         => Object,
   builder     => sub {
     FFI::Raw->new(
-      shift->_zmq_soname, zmq_errno => FFI::Raw::int
+      shift->zmq_soname, zmq_errno => FFI::Raw::int
     )
   },
 );
@@ -163,7 +163,7 @@ has _zmq_strerr => (
   isa         => Object,
   builder     => sub {
     FFI::Raw->new(
-      shift->_zmq_soname, zmq_strerror => FFI::Raw::str, FFI::Raw::int
+      shift->zmq_soname, zmq_strerror => FFI::Raw::str, FFI::Raw::int
     )
   },
 );
@@ -184,7 +184,7 @@ has _zmq_curve_keypair => (
   builder     => sub {
     my ($self) = @_;
     FFI::Raw->new(
-      $self->_zmq_soname, zmq_curve_keypair =>
+      $self->zmq_soname, zmq_curve_keypair =>
         FFI::Raw::int,  # <- rc
         FFI::Raw::ptr,  # -> pub key ptr
         FFI::Raw::ptr,  # -> sec key ptr
@@ -225,9 +225,6 @@ sub _read_cert {
 
 sub generate_keypair {
   my ($self) = @_;
-
-  # FIXME if POEx::ZMQ::FFI::Context is loaded, call ->generate_keypair there
-  # instead?
 
   my ($pub, $sec) = (
     FFI::Raw::memptr(41), FFI::Raw::memptr(41)
@@ -361,6 +358,11 @@ The L</secret_key>, as a C<Z85>-encoded ASCII string (see L<Convert::Z85>).
 =head3 metadata
 
 The certificate metadata, as a L<List::Objects::WithUtils::Hash>.
+
+=head3 zmq_soname
+
+The C<libzmq> dynamic library name; by default, the newest available library
+is chosen.
 
 =head2 METHODS
 
