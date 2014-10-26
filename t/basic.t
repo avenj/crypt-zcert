@@ -10,7 +10,8 @@ use Text::ZPL;
 
 { # generate_keypair
   my $keypair = Crypt::ZCert->new->generate_keypair;
-  ok $keypair->public && $keypair->secret, 'keypair';
+  ok $keypair->public && $keypair->secret, 
+    'generate_keypair produced public/secret';
 }
 
 { # export_zcert
@@ -65,18 +66,57 @@ use Text::ZPL;
     'secret_key_z85 matches secret_file';
 }
 
-#FIXME { # public_file, nonextant
-#}
+{ # public_file, nonextant
+  my $tempdir = Path::Tiny->tempdir(CLEANUP => 1);
+  my $zcert = Crypt::ZCert->new(
+    public_file => $tempdir .'/zcert',
+  );
+  ok $zcert->commit == $zcert, 'commit returned invocant';
+  my $reloaded = Crypt::ZCert->new(
+    public_file => $tempdir .'/zcert',
+  );
+  cmp_ok $reloaded->public_key_z85, 'eq', $zcert->public_key_z85,
+    'wrote new public key';
+  cmp_ok $reloaded->secret_key_z85, 'eq', $zcert->secret_key_z85,
+    'wrote new secret key';
+}
 
-#FIXME { # public_file + secret_file, neither extant
-#}
+{ # public_file + secret_file, neither extant
+  my $tempdir = Path::Tiny->tempdir(CLEANUP => 1);
+  my $zcert = Crypt::ZCert->new(
+    public_file => $tempdir .'/zcert',
+    secret_file => $tempdir .'/zcert_sekrit',
+  );
+  $zcert->commit;
+  ok $zcert->secret_file->exists, 'secret_file exists after commit';
+  my $reloaded = Crypt::ZCert->new(
+    public_file => $tempdir .'/zcert',
+    secret_file => $tempdir .'/zcert_sekrit',
+  );
+  cmp_ok $reloaded->public_key_z85, 'eq', $zcert->public_key_z85,
+    'wrote new public key (with secret_file specified)';
+  cmp_ok $reloaded->secret_key_z85, 'eq', $zcert->secret_key_z85,
+    'wrote new secret key (with secret_file specified)';
+}
 
-#FIXME { # public_file + secret_file, secret_file extant, missing public
-  # (warns)
-#}
+{ # public_file + secret_file, secret_file extant, missing public
+  # (warns in constructor)
+  my $tempdir = Path::Tiny->tempdir(CLEANUP => 1);
+  my $orig = Crypt::ZCert->new(
+    public_file => $tempdir .'/zcert',
+    secret_file => $tempdir .'/sekrit',
+  )->commit;
+  my $warned = 0;
+  local $SIG{__WARN__} = sub { $warned++ };
+  my $zcert = Crypt::ZCert->new(
+    public_file => $tempdir .'/foo',
+    secret_file => $tempdir .'/sekrit',
+  );
+  ok $warned, 'missing public_file warns';
+}
 
 { # public_file + secret_file, public_file extant, missing secret
-  # (dies)
+  # (dies in constructor)
   eval {; 
     Crypt::ZCert->new(
       public_file => 't/inc/zcert',
@@ -96,9 +136,18 @@ use Text::ZPL;
     'commit without public_file/secret_file dies';
 }
 
-#FIXME { # only secret file specified
-  # (commit dies)
-#}
+{ # only secret file specified (constructor warns, commit dies)
+  my $warned = 0;
+  local $SIG{__WARN__} = sub { $warned++ };
+  my $zcert = Crypt::ZCert->new(
+    secret_file => 't/inc/zcert_secret',
+  );
+  ok $warned, 'loading secret_file without public_file warns';
+  ok $zcert->public_key && $zcert->secret_key,
+    'loaded from secret_file only';
+  eval {; $zcert->commit };
+  like $@, qr/no.public_file/, 'commit without public_file dies';
+}
 
 { # ignore_existing => 1
   my $tempdir = Path::Tiny->tempdir(CLEANUP => 1);
