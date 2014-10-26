@@ -22,6 +22,7 @@ if (my $err = $@) {
   }
 }
 
-ok $soname, "Testing against libzmq: '$soname'";
+ok $soname, 'have libzmq soname';
+diag "Testing against libzmq: '$soname'";
 
 done_testing
