@@ -10,8 +10,10 @@ use Text::ZPL;
 
 { # generate_keypair
   my $keypair = Crypt::ZCert->new->generate_keypair;
-  ok $keypair->public && $keypair->secret, 
-    'generate_keypair produced public/secret';
+  cmp_ok length($keypair->public), '==', 40,
+    'generate_keypair produced 40 char public key';
+  cmp_ok length($keypair->secret), '==', 40,
+    'generate_keypair produced 40 char secret key';
 }
 
 { # export_zcert
