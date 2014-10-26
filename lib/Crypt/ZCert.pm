@@ -214,6 +214,10 @@ sub _read_cert {
          " -- you may want to call a commit()"
   }
 
+  if ($self->has_secret_file && !$self->public_file) {
+    warn "No 'public_file' specified; commit() will fail!"
+  }
+
   my $secdata = decode_zpl( $self->secret_file->slurp );
   
   $secdata->{curve} ||= +{};
