@@ -383,8 +383,8 @@ permissions to C<0600> after writing.
 =head3 ignore_existing
 
 If boolean true, any existing L</public_file> / L</secret_file> will not be
-read; calling a L</commit> will cause a forcible regeneration/rewrite of the
-existing certificate files.
+read; calling a L</commit> will cause a forcible key regeneration and rewrite
+of the existing certificate files.
 
 (Obviously, this should be used with caution.)
 
@@ -431,7 +431,7 @@ The certificate metadata, as a L<List::Objects::WithUtils::Hash>.
 
 If the object is constructed from an existing L</public_file> /
 L</secret_file>, metadata key/value pairs in the loaded file will override
-key/value pairs set in the object's C<metadata> hash.
+key/value pairs that were previously set in a passed C<metadata> hash.
 
 =head3 zmq_soname
 
