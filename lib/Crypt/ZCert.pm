@@ -255,12 +255,9 @@ sub export_zcert {
   my ($self) = @_;
 
   my $data = +{
-     curve    => +{
-      'public-key' => $self->public_key_z85,
-    },
+    curve    => +{ 'public-key' => $self->public_key_z85 },
     metadata => $self->metadata,
   };
-  
   my $public = encode_zpl $data;
   $data->{curve}->{'secret-key'} = $self->secret_key_z85;
   my $secret = encode_zpl $data;
