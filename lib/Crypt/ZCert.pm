@@ -298,7 +298,7 @@ sub commit {
 
 =head1 NAME
 
-Crypt::ZCert - Manage ZeroMQ4+ ZCert CURVE certificates
+Crypt::ZCert - Manage ZeroMQ 4+ ZCert CURVE keys and certificates
 
 =head1 SYNOPSIS
 
@@ -348,7 +348,7 @@ keys.
 
 ZCert files are C<ZPL> format (see L<Text::ZPL>) with two subsections,
 C<curve> and C<metadata>. The C<curve> section specifies C<public-key> and
-C<secret-key> names whose values are C<Z85>-encoded (see L<Convert::Z85> CURVE
+C<secret-key> names whose values are C<Z85>-encoded (see L<Convert::Z85>) CURVE
 keys.
 
 On disk, the certificate is stored as two files; a L</public_file> (containing
@@ -390,7 +390,7 @@ of the existing certificate files.
 
 =head3 public_key
 
-The public key, as a 32-bit binary string.
+The public key, as a binary string.
 
 If none is specified at construction-time and no L</secret_file> exists, a new
 key pair is generated via L<zmq_curve_keypair(3)> and L</secret_key> is set
@@ -398,7 +398,7 @@ appropriately.
 
 =head3 secret_key
 
-The secret key, as a 32-bit binary string.
+The secret key, as a binary string.
 
 If none is specified at construction-time and no L</secret_file> exists, a new
 key pair is generated via L<zmq_curve_keypair(3)> and L</public_key> is set
