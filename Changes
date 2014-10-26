@@ -1,5 +1,9 @@
 Revision history for Perl module Crypt-ZCert
 
+0.002002 2014-10-26
+
+  - Documentation & test fixes
+
 0.002001 2014-10-26
 
   - Provide 'export_zcert' method for returning generated certs

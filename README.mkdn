@@ -1,6 +1,6 @@
 # NAME
 
-Crypt::ZCert - Manage ZeroMQ4+ ZCert CURVE certificates
+Crypt::ZCert - Manage ZeroMQ 4+ ZCert CURVE keys and certificates
 
 # SYNOPSIS
 
@@ -50,7 +50,7 @@ keys.
 
 ZCert files are `ZPL` format (see [Text::ZPL](https://metacpan.org/pod/Text::ZPL)) with two subsections,
 `curve` and `metadata`. The `curve` section specifies `public-key` and
-`secret-key` names whose values are `Z85`-encoded (see [Convert::Z85](https://metacpan.org/pod/Convert::Z85) CURVE
+`secret-key` names whose values are `Z85`-encoded (see [Convert::Z85](https://metacpan.org/pod/Convert::Z85)) CURVE
 keys.
 
 On disk, the certificate is stored as two files; a ["public\_file"](#public_file) (containing
@@ -92,7 +92,7 @@ of the existing certificate files.
 
 ### public\_key
 
-The public key, as a 32-bit binary string.
+The public key, as a binary string.
 
 If none is specified at construction-time and no ["secret\_file"](#secret_file) exists, a new
 key pair is generated via [zmq\_curve\_keypair(3)](http://man.he.net/man3/zmq_curve_keypair) and ["secret\_key"](#secret_key) is set
@@ -100,7 +100,7 @@ appropriately.
 
 ### secret\_key
 
-The secret key, as a 32-bit binary string.
+The secret key, as a binary string.
 
 If none is specified at construction-time and no ["secret\_file"](#secret_file) exists, a new
 key pair is generated via [zmq\_curve\_keypair(3)](http://man.he.net/man3/zmq_curve_keypair) and ["public\_key"](#public_key) is set
