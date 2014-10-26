@@ -466,6 +466,16 @@ and B<secret>:
   my $pub_z85 = $keypair->public;
   my $sec_z85 = $keypair->secret;
 
+=head1 SEE ALSO
+
+L<Text::ZPL>
+
+L<Convert::Z85>
+
+L<POEx::ZMQ>
+
+L<ZMQ::FFI>
+
 =head1 AUTHOR
 
 Jon Portnoy <avenj@cobaltirc.org>
