@@ -1,5 +1,16 @@
 Revision history for Perl module Crypt-ZCert
 
+0.002001 2014-10-26
+
+  - Provide 'export_zcert' method for returning generated certs
+
+  - Add 'ignore_existing =>' constructor opt to allow overwriting existing
+    certificates
+
+  - Fix missing file warn/die behavior
+
+  - Return invocant from ->commit
+
 0.001001 2014-10-25
 
-   - Initial release
+  - Initial release
