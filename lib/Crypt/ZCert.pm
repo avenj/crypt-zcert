@@ -198,14 +198,14 @@ sub _read_cert {
 
   return unless $self->has_secret_file or $self->has_public_file;
 
-  unless ($self->secret_file->exists) {
+  if (!$self->secret_file->exists) {
     if ($self->public_file && $self->public_file->exists) {
       # public_file exists, secret_file does not, do the safe thing and
       # refuse to overwrite existing public_file:
       confess "Found 'public_file' but not 'secret_file'; ",
               "Check your key file paths, remove the 'public_file', ",
               "or specify 'ignore_existing => 1' to overwrite"
-   }
+    }
     return
   }
   
@@ -214,7 +214,7 @@ sub _read_cert {
          " -- you may want to call a commit()"
   }
 
-  if ($self->has_secret_file && !$self->public_file) {
+  if (!$self->public_file) {
     warn "No 'public_file' specified; commit() will fail!"
   }
 
