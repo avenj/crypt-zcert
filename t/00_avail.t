@@ -15,8 +15,8 @@ if (my $err = $@) {
 
 eval {; Crypt::ZCert->new->generate_keypair };
 if (my $err = $@) {
-  if ($err =~ /Not.supported/) {
-    BAIL_OUT "OS unsupported - libzmq missing CURVE support"
+  if ($err =~ /Not.supported|Operation/) {
+    BAIL_OUT "OS unsupported - libzmq missing CURVE support: $err"
   } else {
     die $@
   }
