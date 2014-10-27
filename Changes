@@ -1,5 +1,9 @@
 Revision history for Perl module Crypt-ZCert
 
+0.002003 2014-10-27
+
+  - Depend on newer List::Objects::WithUtils to guarantee TO_ZPL availability
+
 0.002002 2014-10-26
 
   - Documentation & test fixes
