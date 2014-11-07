@@ -86,14 +86,14 @@ has public_key => (
   lazy        => 1,
   is          => 'ro',
   isa         => Defined,
-  builder     => sub { decode_z85( shift->public_key_z85 ) },
+  builder     => sub { decode_z85 $_[0]->public_key_z85 },
 );
 
 has secret_key => (
   lazy        => 1,
   is          => 'ro',
   isa         => Defined,
-  builder     => sub { decode_z85( shift->secret_key_z85 ) },
+  builder     => sub { decode_z85 $_[0]->secret_key_z85 },
 );
 
 has metadata => (
@@ -177,9 +177,8 @@ has _zmq_curve_keypair => (
   is          => 'ro',
   isa         => Object,
   builder     => sub {
-    my ($self) = @_;
     FFI::Raw->new(
-      $self->zmq_soname, zmq_curve_keypair =>
+      shift->zmq_soname, zmq_curve_keypair =>
         FFI::Raw::int,  # <- rc
         FFI::Raw::ptr,  # -> pub key ptr
         FFI::Raw::ptr,  # -> sec key ptr
