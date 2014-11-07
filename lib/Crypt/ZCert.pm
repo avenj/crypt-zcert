@@ -231,7 +231,9 @@ sub _read_cert {
   }
   $self->_set_public_key_z85($pubkey);
   $self->_set_secret_key_z85($seckey);
-  $self->metadata->set(%{ $secdata->{metadata} }) if $secdata->{metadata};
+  $self->metadata->set(%{ $secdata->{metadata} }) 
+    if $secdata->{metadata}
+    and keys %{ $secdata->{metadata} };
 }
 
 sub generate_keypair {
