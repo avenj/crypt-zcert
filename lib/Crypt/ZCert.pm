@@ -202,9 +202,12 @@ sub _read_cert {
     if ($self->public_file && $self->public_file->exists) {
       # public_file exists, secret_file does not, do the safe thing and
       # refuse to overwrite existing public_file:
+      my $secfile = $self->secret_file . '';
+      my $pubfile = $self->public_file . '';
       confess "Found 'public_file' but not 'secret_file'; ",
               "Check your key file paths, remove the 'public_file', ",
-              "or specify 'ignore_existing => 1' to overwrite"
+              "or specify 'ignore_existing => 1' to overwrite ",
+              "(pub: $pubfile) (sec: $secfile)"
     }
     return
   }
