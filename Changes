@@ -1,5 +1,9 @@
 Revision history for Perl module Crypt-ZCert
 
+0.002004 2014-11-08
+
+  - Switch to FFI::CheckLib for dynamic lib check
+
 0.002003 2014-10-27
 
   - Depend on newer List::Objects::WithUtils to guarantee TO_ZPL availability
