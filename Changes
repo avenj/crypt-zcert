@@ -1,5 +1,9 @@
 Revision history for Perl module Crypt-ZCert
 
+0.002005 2014-11-21
+
+  - Depend on newer Path::Tiny (for ->chmod)
+
 0.002004 2014-11-08
 
   - Switch to FFI::CheckLib for dynamic lib check
