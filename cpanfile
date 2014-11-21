@@ -17,5 +17,5 @@ requires "Types::Path::Tiny"    => "0";
 requires "Types::Standard"      => "0";
 
 on 'test'      => sub {
-  requires "Path::Tiny"   => "0.040";
+  requires "Path::Tiny"   => "0.061";
 };
