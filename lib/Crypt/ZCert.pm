@@ -49,9 +49,7 @@ has secret_file => (
   predicate   => 1,
   builder     => sub {
     my ($self) = @_;
-    $self->has_public_file ?
-      $self->public_file . '_secret'
-      : undef
+    $self->has_public_file ? $self->public_file . '_secret' : undef
   },
 );
 
@@ -232,8 +230,7 @@ sub _read_cert {
   $self->_set_public_key_z85($pubkey);
   $self->_set_secret_key_z85($seckey);
   $self->metadata->set(%{ $secdata->{metadata} }) 
-    if $secdata->{metadata}
-    and keys %{ $secdata->{metadata} };
+    if $secdata->{metadata} and keys %{ $secdata->{metadata} };
 }
 
 sub generate_keypair {
@@ -326,10 +323,10 @@ Crypt::ZCert - Manage ZeroMQ 4+ ZCert CURVE keys and certificates
 
   # Commit certificate to disk
   # (as '/foo/mycert', '/foo/mycert_secret' pair)
-  # Without 'adjust_permissions => 0', _secret becomes chmod 0600:
+  # Without '->new(adjust_permissions => 0)', _secret becomes chmod 0600:
   $zcert->commit;
 
-  # Retrieve a public/secret ZCert file pair without writing:
+  # Retrieve a public/secret ZCert file pair (as ZPL) without writing:
   my $certdata = $zcert->export_zcert;
   my $pubdata  = $certdata->public;
   my $secdata  = $certdata->secret;
