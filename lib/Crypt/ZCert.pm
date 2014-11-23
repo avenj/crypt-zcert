@@ -234,7 +234,7 @@ sub _read_cert {
 }
 
 sub generate_keypair {
-  my ($self) = @_;
+  my ($self) = blessed $_[0] ? $_[0] : $_[0]->new;
 
   my ($pub, $sec) = (
     FFI::Raw::memptr(41), FFI::Raw::memptr(41)

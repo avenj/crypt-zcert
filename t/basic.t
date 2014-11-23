@@ -9,7 +9,7 @@ use Convert::Z85;
 use Text::ZPL;
 
 { # generate_keypair
-  my $keypair = Crypt::ZCert->new->generate_keypair;
+  my $keypair = Crypt::ZCert->generate_keypair;
   cmp_ok length($keypair->public), '==', 40,
     'generate_keypair produced 40 char public key';
   cmp_ok length($keypair->secret), '==', 40,
