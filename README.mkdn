@@ -158,8 +158,8 @@ ZPL-encoded ASCII text:
 
 ### generate\_keypair
 
-Generate and return a new key pair via [zmq\_curve\_keypair(3)](http://man.he.net/man3/zmq_curve_keypair); the current
-ZCert object remains unchanged.
+Generate and return a new key pair via [zmq\_curve\_keypair(3)](http://man.he.net/man3/zmq_curve_keypair); if called as
+an instance method, the current ZCert object remains unchanged.
 
 The returned key pair is a struct-like object with two accessors, **public**
 and **secret**:
@@ -167,6 +167,8 @@ and **secret**:
     my $keypair = $zcert->generate_keypair;
     my $pub_z85 = $keypair->public;
     my $sec_z85 = $keypair->secret;
+
+Can be called as either a class or instance method.
 
 # SEE ALSO
 

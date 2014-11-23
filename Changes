@@ -1,5 +1,9 @@
 Revision history for Perl module Crypt-ZCert
 
+0.003001 2014-11-23
+
+  - Make ->generate_keypair available as a class method
+
 0.002005 2014-11-21
 
   - Depend on newer Path::Tiny (for ->chmod)
