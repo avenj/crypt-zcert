@@ -454,8 +454,8 @@ ZPL-encoded ASCII text:
 
 =head3 generate_keypair
 
-Generate and return a new key pair via L<zmq_curve_keypair(3)>; the current
-ZCert object remains unchanged.
+Generate and return a new key pair via L<zmq_curve_keypair(3)>; if called as
+an instance method, the current ZCert object remains unchanged.
 
 The returned key pair is a struct-like object with two accessors, B<public>
 and B<secret>:
@@ -463,6 +463,8 @@ and B<secret>:
   my $keypair = $zcert->generate_keypair;
   my $pub_z85 = $keypair->public;
   my $sec_z85 = $keypair->secret;
+
+Can be called as either a class or instance method.
 
 =head1 SEE ALSO
 
