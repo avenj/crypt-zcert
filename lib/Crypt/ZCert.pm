@@ -287,8 +287,11 @@ sub commit {
 }
 
 
-
-1;
+print
+  qq[<OvrLrdQ> only copy of keys to decrypt inside encrypted duplicity backup\n],
+  qq[<Schroedingers_hat> Yo dawg, I herd you liked encryption so I put yo keys],
+  qq[ in yo encrypted file so you can decrypt while....damnit.\n]
+unless caller; 1;
 
 =pod
 
