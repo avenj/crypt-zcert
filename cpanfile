@@ -1,5 +1,5 @@
 requires "perl"           => "5.010";
-requires "strictures"     => "1";
+requires "strictures"     => "2";
 
 requires "List::Objects::WithUtils" => "2.016";
 requires "Try::Tiny"      => "0";

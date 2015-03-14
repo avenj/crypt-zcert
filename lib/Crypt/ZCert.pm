@@ -2,7 +2,7 @@ package Crypt::ZCert;
 
 use v5.10;
 use Carp;
-use strictures 1;
+use strictures 2;
 
 use FFI::Raw;
 
