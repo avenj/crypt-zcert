@@ -1,5 +1,9 @@
 Revision history for Perl module Crypt-ZCert
 
+0.003002 2015-07-17
+
+  - 'use strictures 2;' for saner fatal warnings behavior
+
 0.003001 2014-11-23
 
   - Make ->generate_keypair available as a class method
